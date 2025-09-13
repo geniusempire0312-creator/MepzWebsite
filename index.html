@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Borel&family=Kirang+Haerang&family=Playwrite+IN:wght@100..400&family=Story+Script&display=swap" rel="stylesheet">
+  <title>MEPz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f9f1;
+      color: #2e4d34;
+    }
+
+    header {
+      background-color: #187525;
+      color: white;
+      padding: 30px 0;
+      text-align: center;
+      font-family: "Story Script", sans-serif;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      background-image: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+      color: rgb(53, 104, 57);
+      padding: 100px 20px;
+      text-align: center;
+
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      font-family: "Story Script", sans-serif;
+    }
+
+    .hero p {
+      font-size: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 40px 20px;
+    }
+
+    section {
+      margin-bottom: 50px;
+    }
+
+    h2 {
+      color: #1b5e20;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    footer {
+      background-color: #1b5e20;
+      color: rgb(141, 207, 138);
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* Gallery Grid */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .card .caption {
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      color: #2e4d34;
+    }
+
+    @media (max-width: 600px) {
+      nav a {
+        display: block;
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <a href="#about">About Us</a>
+      <a href="pollution.html">Pollution</a>
+      <a href="quiz.html">Quiz</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>MEPz: Mother Earth Protection Zone</h1>
+  </div>
+
+  <div class="container">
+    <section id="about">
+      <h2>Mother Earth Protection Zone</h2>
+      <p>
+       MEPz stands for Mother Earth Protection Zone. Our focus is to reduce air pollution and creating an eco-friendly zone
+      </p>
+      <p> </p>
+      <p>The reason we are working on this project is because our world is facing  a serious air pollution problem.</p>
+    </section> 
+
+    <section id="help">
+      <h2>How Can We Help</h2>
+      <p>Our project also creates awareness for the public through a fun quiz and facts about air pollution.</p>
+    </section>
+
+    <section id="gallery">
+      <h2>Nature Gallery</h2>
+      <div class="gallery">
+        <div class="card">
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNVl-JrWv8a7N8OhJt4MgKecfAwYm0UfzUcQ&s" alt="Forest" />
+          <div class="caption">Green Forest</div>
+        </div>
+        <div class="card">
+          <img src="https://t4.ftcdn.net/jpg/10/34/14/09/360_F_1034140967_XlSisARPMmMK0USBm9SohIwLaH4BsGbu.jpg" alt="Mountain" />
+          <div class="caption">Green Mountains</div>
+        </div>
+        <div class="card">
+          <img src="https://www.shutterstock.com/shutterstock/videos/26036489/thumb/7.jpg?ip=x480" alt="Ocean" />
+          <div class="caption">Clean Ocean</div>
+        </div>
+        <div class="card">
+          <img src="https://www.shutterstock.com/image-photo/ing-lion-cub-wildlife-animals-600nw-2597617703.jpg" alt="Wildlife" />
+          <div class="caption">Wildlife Animal</div>
+        </div>
+        <div class="card">
+          <img src="https://blog.sothebysrealty.ae/hubfs/Cleanest%20Cities%20in%20the%20World-jpg-1.jpeg" alt="Sunset" />
+          <div class="caption">Clean City</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Email: school email</p>
+     
+    </section>
+  </div>
+
+  <footer>
+   &copy; 2025 MEPz. All rights reserved.
+  </footer>
+
+</body>
+</html>
