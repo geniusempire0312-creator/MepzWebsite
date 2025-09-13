@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MEPz</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #e8f5e9;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header {
+      background-color: #187525;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      font-family: "Story Script", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a {
+      margin: 0 15px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 10px #ccc;
+    }
+    .option {
+      margin: 10px;
+      padding: 10px;
+      background: #c8e6c9;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .option:hover {
+      background: #a5d6a7;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+    }
+    #leaderboard {
+      margin-top: 30px;
+      text-align: left;
+    }
+  </style>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // 🔥 Your Firebase Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const leaderboardRef = collection(db, "leaderboard");
+
+    const questions = [
+      {
+        question: "What is the meaning of air pollution?",
+        options: ["Air is polluted", "The alteration of air quality", "The air is dirty for breathing"],
+        answer: "The alteration of air quality"
+      },
+      {
+        question: "How many types of air pollution are there?",
+        options: ["2", "8", "5"],
+        answer: "2"
+      },
+      {
+        question: "What are the man-made causes of air pollution? I. Power generation II. Forest fire III. Weather IV. Urbanization",
+        options: ["I & II", "II & IV", "I & IV"],
+        answer: "I & IV"
+      },
+      {
+        question: "What does CFC stands for?",
+        options: ["chloroflurocarbon", "chloroformcarbon", "carbonfluronatrium"],
+        answer: "chloroflurocarbon"
+      },
+      {
+        question: "Why does fossil fuel burning for power generation harmful for the air?",
+        options: ["Releases harmful air pollutants", "create a serious haze", "Our atmoshphere become hotter"],
+        answer: "Releases harmful air pollutants"
+      },
+      {
+        question: "What are the effects of air pollution on our health?",
+        options: ["heart attack", "Difficulty of breathing", "headache"],
+        answer: "Difficulty of breathing"
+      },
+      {
+        question: "What areas can have serious air pollution?",
+        options: ["Rural areas", "Industrial areas", "Areas with a large population"],
+        answer: "Industrial areas"
+      },
+      {
+        question: "How does CFC affect our environment?",
+        options: ["Damages building", "Kills plant and animal", "Destroys the ozone layer"],
+        answer: "Destroys the ozone layer"
+      },
+      {
+        question: "What does AQI stands for?",
+        options: ["Aim Quality Index", "Air Quality Index", "I don't know"],
+        answer: "Air Quality Index"
+      },
+      {
+        question: "What does volcanic erruption release",
+        options: ["Harmful air pollutant", "Black smoke", "Volcanic ash"],
+        answer: "Volcanic ash"
+      },
+      {
+        question: "What volcano errupted in 2010?",
+        options: ["Mount Olympus", "Mount Pompeii", "Mount Eyjafjallajökull"],
+        answer: "Mount Eyjafjallajökull"
+      },
+      {
+        question: "What deserts were mentioned in the website?",
+        options: ["Qatar Desert", "Egyptian Desert", "Gobi Desert"],
+        answer: "Gobi Desert"
+      },
+      {
+        question: "What does MEPz stands for?",
+        options: ["Mother Earth Protection zone", "Mother Earth Privacy zone", "Must Early Protect zone"],
+        answer: "Mother Earth Protection zone"
+      },
+      {
+        question: "What electrical applieances contributed to CFC before it was banned?",
+        options: ["Air Conditioner", "Vacuum", "Oven"],
+        answer: "Air Conditioner"
+      },
+      {
+        question: "Which of the following is a megacity",
+        options: ["Kuala Lumpur", "Mumbai", "Tokyo"],
+        answer: "Tokyo"
+      },
+      {
+        question: "Which of the following is considered hazardous for PM 10 according to the AQI?",
+        options: ["425+", "365+", "800+"],
+        answer: "425+"
+      },
+      {
+        question: "What can we do to reduce air pollution?",
+        options: ["Ban the usage of diesel powered vehichle", "Limit the human population", "Plant trees in cities"],
+        answer: "Plant trees in cities"
+      },
+      {
+        question: "What agreement was signed to ban CFC in 1987?",
+        options: ["The Montreal Protocol", "Treaty of Versailles", "The Potsdam Agreement"],
+        answer: "The Montreal Protocol"
+      },
+       {
+        question: "Which of the following country is considered the cleanest country according to the 2024 Environmental Performance Index?",
+        options: ["America", "Japan", "Estonia"],
+        answer: "Estonia"
+      },
+      {
+        question: "Bonus Question: When was this website created?",
+        options: ["2025", "Yesterday", "2013"],
+        answer: "2025"
+      },
+
+  
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function showQuestion() {
+      const q = questions[current];
+      document.getElementById("question").textContent = q.question;
+      const optDiv = document.getElementById("options");
+      optDiv.innerHTML = "";
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === q.answer) score++;
+          current++;
+          current < questions.length ? showQuestion() : showScore();
+        };
+        optDiv.appendChild(btn);
+      });
+    }
+
+    function showScore() {
+      document.getElementById("quiz").style.display = "none";
+      document.getElementById("score").style.display = "block";
+      document.getElementById("final-score").textContent = score;
+    }
+
+    async function submitScore() {
+      const name = document.getElementById("username").value || "Anonymous";
+      await addDoc(leaderboardRef, { name, score });
+      loadLeaderboard();
+    }
+
+    async function loadLeaderboard() {
+      const q = query(leaderboardRef, orderBy("score", "desc"), limit(5));
+      const snapshot = await getDocs(q);
+      const list = document.getElementById("leaderboard-list");
+      list.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const li = document.createElement("li");
+        li.textContent = `${data.name} - ${data.score}`;
+        list.appendChild(li);
+      });
+    }
+
+    window.onload = () => {
+      showQuestion();
+      loadLeaderboard();
+      document.getElementById("submit-btn").onclick = submitScore;
+    };
+  </script>
+</head>
+<body>
+
+<header>
+    <h1>MEPz: Mother Earth Protection Zone</h1>
+    <nav>
+      <a href="index2.html">About</a>
+      <a href="pollution.html">Pollution</a>
+      <a href="quiz.html">Quiz</a>
+    </nav>
+  </header>
+
+
+  <div class="container">
+    <div id="quiz">
+      <h2>Quiz Game</h2>
+      <div id="question">Loading...</div>
+      <div id="options"></div>
+    </div>
+
+    <div id="score" style="display:none;">
+      <h2>Quiz Finished!</h2>
+      <p>Your Score: <span id="final-score"></span></p>
+      <input id="username" placeholder="Enter your name">
+      <button id="submit-btn">Submit Score</button>
+    </div>
+
+    <div id="leaderboard">
+      <h3>🏆 Leaderboard</h3>
+      <ol id="leaderboard-list"></ol>
+    </div>
+  </div>
+</body>
+</html>
