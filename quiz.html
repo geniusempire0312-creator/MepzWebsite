@@ -88,6 +88,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const leaderboardRef = collection(db, "leaderboard");
+    document.getElementById("question").style.fontSize="44px";
 
     const questions = [
       {
@@ -284,6 +285,7 @@
   </footer>
 </body>
 </html>
+
 
 
 
