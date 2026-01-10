@@ -72,26 +72,29 @@
     }
   </style>
   <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+ <script type="module">
+  // 1. Change imports from 'firestore' to 'database'
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // 🔥 Your Firebase Config
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyD0PJIC76NEr3FdFnK32NbEevxxH_YToLM",
+    authDomain: "mepz-6d5ca.firebaseapp.com",
+    databaseURL: "https://mepz-6d5ca-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "mepz-6d5ca",
+    storageBucket: "mepz-6d5ca.firebasestorage.app",
+    messagingSenderId: "234419310768",
+    appId: "1:234419310768:web:99280478b93bd8c9fa2b75",
+    measurementId: "G-TG8HJF3715"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const leaderboardRef = collection(db, "leaderboard");
-    document.getElementById("question").style.fontSize="44px";
+  // 2. Initialize Realtime Database
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const leaderboardRef = ref(db, "leaderboard");
 
-    const questions = [
+  // ... (keep your questions array and showQuestion/showScore functions the same) ...
+const questions = [
       {
         question: "What is the meaning of air pollution?",
         options: ["Air is polluted", "The alteration of air quality", "The air is dirty for breathing"],
@@ -195,59 +198,44 @@
 
   
     ];
+  // 3. Updated Submit Function for Realtime Database
+  async function submitScore() {
+    const name = document.getElementById("username").value || "Anonymous";
+    const newScoreRef = push(leaderboardRef); // Creates a unique ID
+    await set(newScoreRef, { name, score: parseInt(score) });
+    alert("Score submitted!");
+  }
 
-    let current = 0;
-    let score = 0;
-
-    function showQuestion() {
-      const q = questions[current];
-      document.getElementById("question").textContent = q.question;
-      const optDiv = document.getElementById("options");
-      optDiv.innerHTML = "";
-      q.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "option";
-        btn.textContent = opt;
-        btn.onclick = () => {
-          if (opt === q.answer) score++;
-          current++;
-          current < questions.length ? showQuestion() : showScore();
-        };
-        optDiv.appendChild(btn);
-      });
-    }
-
-    function showScore() {
-      document.getElementById("quiz").style.display = "none";
-      document.getElementById("score").style.display = "block";
-      document.getElementById("final-score").textContent = score;
-    }
-
-    async function submitScore() {
-      const name = document.getElementById("username").value || "Anonymous";
-      await addDoc(leaderboardRef, { name, score });
-      loadLeaderboard();
-    }
-
-    async function loadLeaderboard() {
-      const q = query(leaderboardRef, orderBy("score", "desc"), limit(5));
-      const snapshot = await getDocs(q);
+  // 4. Updated Load Function for Realtime Database
+  function loadLeaderboard() {
+    // Query top 5 scores (ordered by score)
+    const topScoresQuery = query(leaderboardRef, orderByChild("score"), limitToLast(5));
+    
+    onValue(topScoresQuery, (snapshot) => {
       const list = document.getElementById("leaderboard-list");
       list.innerHTML = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
+      const scores = [];
+      
+      snapshot.forEach((childSnapshot) => {
+        scores.push(childSnapshot.val());
+      });
+
+      // RTDB returns limitToLast in ascending order, so we reverse it for the leaderboard
+      scores.reverse().forEach(data => {
         const li = document.createElement("li");
         li.textContent = `${data.name} - ${data.score}`;
         list.appendChild(li);
       });
-    }
+    });
+  }
 
-    window.onload = () => {
-      showQuestion();
-      loadLeaderboard();
-      document.getElementById("submit-btn").onclick = submitScore;
-    };
-  </script>
+  // Initializing the app logic
+  window.onload = () => {
+    showQuestion();
+    loadLeaderboard();
+    document.getElementById("submit-btn").onclick = submitScore;
+  };
+</script>
 </head>
 <body>
 
@@ -286,6 +274,7 @@
   </footer>
 </body>
 </html>
+
 
 
 
