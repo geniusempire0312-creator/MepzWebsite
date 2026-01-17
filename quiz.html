@@ -2,100 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Borel&family=Kirang+Haerang&family=Playwrite+IN:wght@100..400&family=Story+Script&display=swap" rel="stylesheet">
-  <title>MEPz</title>
+  <title>Battle of Britpop Quiz</title>
+
   <style>
     body {
-      font-family: Arial;
-      background: #e8f5e9;
+      font-family: Arial, sans-serif;
+      background: #f0f4ff;
       padding: 20px;
       text-align: center;
     }
 
     header {
-      background-color: #187525;
+      background: #1a237e;
       color: white;
-      padding: 20px 0;
-      text-align: center;
-      font-family: "Story Script", sans-serif;
-      font-weight: 400;
-      font-style: normal;
-        
-    }
-
-    nav {
-      margin-top: 10px;
-    }
-
-    nav a {
-      margin: 0 15px;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-     font-family: "Story Script", sans-serif;
+      padding: 20px;
     }
 
     .container {
-      background: #fff;
-      border-radius: 10px;
+      background: white;
       padding: 30px;
       max-width: 600px;
       margin: auto;
+      border-radius: 10px;
       box-shadow: 0 0 10px #ccc;
     }
+
     .option {
-      padding: 45px;
+      display: block;
+      margin: 10px auto;
       padding: 10px;
-      background: #c8e6c9;
+      width: 100%;
+      background: #c5cae9;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 29px;
+      font-size: 16px;
     }
+
     .option:hover {
-      background: #a5d6a7;
+      background: #9fa8da;
     }
+
     input, button {
       padding: 10px;
       margin-top: 10px;
+      width: 100%;
     }
+
     #leaderboard {
       margin-top: 30px;
       text-align: left;
     }
-     footer {
-      background-color: #f0f9f1;
-      color: rgb(141, 207, 138);
-      text-align: center;
-      padding: 20px 0;
-    }
   </style>
-  <!-- Firebase SDKs -->
+</head>
+  <body>
+
+<header>
+    <h1>MEPz: Mother Earth Protection Zone</h1>
+    <nav>
+      <a href="index.html">About</a>
+      <a href="pollution.html">Pollution</a>
+      <a href="quiz.html">Quiz</a>
+    </nav>
+  </header>
+
+
+<div class="container">
+
+  <div id="quiz">
+    <h2 id="question">Loading...</h2>
+    <div id="options"></div>
+  </div>
+
+  <div id="score-screen" style="display:none;">
+    <h2>Quiz Finished!</h2>
+    <p>Your Score: <span id="final-score"></span></p>
+    <input id="username" placeholder="Enter your name">
+    <button id="submit-btn">Submit Score</button>
+  </div>
+
+  <div id="leaderboard">
+    <h3>🏆 Leaderboard</h3>
+    <ol id="leaderboard-list"></ol>
+  </div>
+
+</div>
+
  <script type="module">
-  // 1. Change imports from 'firestore' to 'database'
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, push, set, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  import { getDatabase, ref, set, push, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyD0PJIC76NEr3FdFnK32NbEevxxH_YToLM",
-    authDomain: "mepz-6d5ca.firebaseapp.com",
-    databaseURL: "https://mepz-6d5ca-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "mepz-6d5ca",
-    storageBucket: "mepz-6d5ca.firebasestorage.app",
-    messagingSenderId: "234419310768",
-    appId: "1:234419310768:web:99280478b93bd8c9fa2b75",
-    measurementId: "G-TG8HJF3715"
+    apiKey: "AIzaSyDJdh_CHt2hfUyYfwZDtaCxd6uRJMVJjwQ",
+  authDomain: "quiz-page-a48e9.firebaseapp.com",
+  databaseURL: "https://quiz-page-a48e9-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quiz-page-a48e9",
+  storageBucket: "quiz-page-a48e9.firebasestorage.app",
+  messagingSenderId: "692408786948",
+  appId: "1:692408786948:web:bd419278e8d9afeb03d551",
+  measurementId: "G-9CC6K29C1J"
   };
 
-  // 2. Initialize Realtime Database
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const leaderboardRef = ref(db, "leaderboard");
+  const leaderboardRef = ref(db, 'leaderboard');
 
-  // ... (keep your questions array and showQuestion/showScore functions the same) ...
-const questions = [
-      {
+  // --- QUIZ LOGIC ---
+  const questions = [
+    {
         question: "What is the meaning of air pollution?",
         options: ["Air is polluted", "The alteration of air quality", "The air is dirty for breathing"],
         answer: "The alteration of air quality"
@@ -196,89 +211,84 @@ const questions = [
         answer: "2025"
       },
 
-  
-    ];
-  // 3. Updated Submit Function for Realtime Database
+  ];
+
+  let current = 0;
+  let score = 0;
+
+  function showQuestion() {
+    if (current >= questions.length) {
+      showScore();
+      return;
+    }
+    const q = questions[current];
+    document.getElementById("question").textContent = q.question;
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach(option => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      btn.textContent = option;
+      btn.onclick = () => {
+        if (option === q.answer) score++;
+        current++;
+        showQuestion();
+      };
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  function showScore() {
+    document.getElementById("quiz").style.display = "none";
+    document.getElementById("score-screen").style.display = "block";
+    document.getElementById("final-score").textContent = score + " / 10";
+  }
+
+  // --- DATABASE FUNCTIONS ---
+
   async function submitScore() {
     const name = document.getElementById("username").value || "Anonymous";
     const newScoreRef = push(leaderboardRef); // Creates a unique ID
-    await set(newScoreRef, { name, score: parseInt(score) });
-    alert("Score submitted!");
+    await set(newScoreRef, {
+      name: name,
+      score: score
+    });
+    
+    // Switch view back to leaderboard (optional)
+    document.getElementById("score-screen").innerHTML = "<h3>Score Submitted!</h3>";
   }
 
-  // 4. Updated Load Function for Realtime Database
   function loadLeaderboard() {
-    // Query top 5 scores (ordered by score)
+    // Realtime Database query: Order by score, get last 5 (highest)
     const topScoresQuery = query(leaderboardRef, orderByChild("score"), limitToLast(5));
     
     onValue(topScoresQuery, (snapshot) => {
       const list = document.getElementById("leaderboard-list");
       list.innerHTML = "";
-      const scores = [];
+      const data = [];
       
       snapshot.forEach((childSnapshot) => {
-        scores.push(childSnapshot.val());
+        data.push(childSnapshot.val());
       });
 
-      // RTDB returns limitToLast in ascending order, so we reverse it for the leaderboard
-      scores.reverse().forEach(data => {
+      // Reverse because limitToLast gives ascending order
+      data.reverse().forEach(entry => {
         const li = document.createElement("li");
-        li.textContent = `${data.name} - ${data.score}`;
+        li.textContent = `${entry.name} - ${entry.score}/10`;
         list.appendChild(li);
       });
     });
   }
 
-  // Initializing the app logic
   window.onload = () => {
     showQuestion();
     loadLeaderboard();
     document.getElementById("submit-btn").onclick = submitScore;
   };
 </script>
-</head>
-<body>
-
-<header>
-    <h1>MEPz: Mother Earth Protection Zone</h1>
-    <nav>
-      <a href="index.html">About</a>
-      <a href="pollution.html">Pollution</a>
-      <a href="quiz.html">Quiz</a>
-    </nav>
-  </header>
 
 
-  <div class="container">
-    <div id="quiz">
-      <h2>Quiz Game</h2>
-      <div id="question">Loading...</div>
-      <div id="options"></div>
-    </div>
 
-    <div id="score" style="display:none;">
-      <h2>Quiz Finished!</h2>
-      <p>Your Score: <span id="final-score"></span></p>
-      <input id="username" placeholder="Enter your name">
-      <button id="submit-btn">Submit Score</button>
-    </div>
-
-    <div id="leaderboard">
-      <h3>🏆 Leaderboard</h3>
-      <ol id="leaderboard-list"></ol>
-    </div>
-  </div>
-
-   <footer>
-    &copy; 2025 MEPz. All rights reserved.
-  </footer>
 </body>
 </html>
-
-
-
-
-
-
-
-
